@@ -1,0 +1,28 @@
+version: "3"
+services:
+  app:
+    build: app
+        context: "./app"
+    command: python main.py
+    ports:
+     - "5000:5000"
+    volumes:
+     - ./app:/code # modified here to take into account the new app path
+  
+  proxy:
+    build: proxy
+        context: "./proxy"
+    restart: always
+    environment:
+      CERTBOT_EMAIL: "tylerjamesconlon@gmail.com"
+      ENVSUBST_VARS: FQDN
+      FQDN: tyler.clarksonmsda.org
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./conf.d:/etc/nginx/user.conf.d:ro
+      - letsencrypt:/etc/letsencrypt
+      
+volumes:
+    letsencrypt:
